@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversor de Preço de Combustível</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #1a4a8e;
+            color: white;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 400px;
+            background-color: #2459a9;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        h2 {
+            text-align: center;
+            background-color: black;
+            padding: 10px;
+            margin-top: 0;
+            text-transform: uppercase;
+            font-size: 1.2rem;
+            border-radius: 4px;
+        }
+        .fuel-section {
+            margin-bottom: 30px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .label-etanol { background-color: #1e6b30; color: white; padding: 5px; text-align: center; font-weight: bold; }
+        .label-gasolina { background-color: #d35400; color: white; padding: 5px; text-align: center; font-weight: bold; }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background-color: #ddd;
+            gap: 2px;
+        }
+        .grid-header {
+            background-color: #bcbcbc;
+            color: black;
+            padding: 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-align: center;
+        }
+        .grid-body {
+            background-color: white;
+            color: black;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+        input {
+            width: 85%;
+            border: 1px solid #ccc;
+            padding: 6px;
+            font-size: 1rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+        .result {
+            font-weight: 800;
+            font-size: 1.2rem;
+            color: #d35400; /* Cor de destaque para o valor final */
+        }
+        .info-text {
+            font-size: 0.7rem;
+            color: #555;
+            margin-bottom: 2px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Conversão de Preço</h2>
+
+    <div class="fuel-section">
+        <div class="label-etanol">ETANOL</div>
+        <div class="grid">
+            <div class="grid-header">VALOR NA BOMBA</div>
+            <div class="grid-header">VALOR COM DESCONTO</div>
+            
+            <div class="grid-body">
+                <span class="info-text">Preço Litro (R$)</span>
+                <input type="number" id="e_bomba" value="4.19" step="0.001" oninput="calcularEtanol()">
+                <span class="info-text">Total p/ Bomba</span>
+                <div class="result" id="e_total_bomba">R$ 0,00</div>
+            </div>
+            
+            <div class="grid-body">
+                <span class="info-text">Preço c/ App (R$)</span>
+                <input type="number" id="e_pago" value="3.89" step="0.001" oninput="calcularEtanol()">
+                <span class="info-text">Total a Pagar (R$)</span>
+                <input type="number" id="e_final" placeholder="Ex: 50.00" step="0.01" oninput="calcularEtanol()">
+            </div>
+        </div>
+    </div>
+
+    <div class="fuel-section">
+        <div class="label-gasolina">GASOLINA</div>
+        <div class="grid">
+            <div class="grid-header">VALOR NA BOMBA</div>
+            <div class="grid-header">VALOR COM DESCONTO</div>
+            
+            <div class="grid-body">
+                <span class="info-text">Preço Litro (R$)</span>
+                <input type="number" id="g_bomba" value="5.89" step="0.001" oninput="calcularGasolina()">
+                <span class="info-text">Total p/ Bomba</span>
+                <div class="result" id="g_total_bomba">R$ 0,00</div>
+            </div>
+            
+            <div class="grid-body">
+                <span class="info-text">Preço c/ App (R$)</span>
+                <input type="number" id="g_pago" value="5.59" step="0.001" oninput="calcularGasolina()">
+                <span class="info-text">Total a Pagar (R$)</span>
+                <input type="number" id="g_final" placeholder="Ex: 50.00" step="0.01" oninput="calcularGasolina()">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function calcularEtanol() {
+        const precoBomba = parseFloat(document.getElementById('e_bomba').value) || 0;
+        const precoDesconto = parseFloat(document.getElementById('e_pago').value) || 0;
+        const totalPagar = parseFloat(document.getElementById('e_final').value) || 0;
+
+        if (precoDesconto > 0 && totalPagar > 0) {
+            const litros = totalPagar / precoDesconto;
+            const totalBomba = litros * precoBomba;
+            document.getElementById('e_total_bomba').innerText = "R$ " + totalBomba.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        } else {
+            document.getElementById('e_total_bomba').innerText = "R$ 0,00";
+        }
+    }
+
+    function calcularGasolina() {
+        const precoBomba = parseFloat(document.getElementById('g_bomba').value) || 0;
+        const precoDesconto = parseFloat(document.getElementById('g_pago').value) || 0;
+        const totalPagar = parseFloat(document.getElementById('g_final').value) || 0;
+
+        if (precoDesconto > 0 && totalPagar > 0) {
+            const litros = totalPagar / precoDesconto;
+            const totalBomba = litros * precoBomba;
+            document.getElementById('g_total_bomba').innerText = "R$ " + totalBomba.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        } else {
+            document.getElementById('g_total_bomba').innerText = "R$ 0,00";
+        }
+    }
+</script>
+
+</body>
+</html>
