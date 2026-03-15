@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Calculadora de Desconto</title>
-   
+    <title>Calculadora Multi-Combustível Dark</title>
+
     <style>
         * { box-sizing: border-box; }
 
@@ -13,7 +13,7 @@
             background-color: #1a4a8e;
             color: white;
             margin: 0;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             justify-content: center;
         }
@@ -21,60 +21,106 @@
         .container {
             width: 100%;
             max-width: 450px;
-            background-color: #2459a9;
-            padding: 15px;
-            border-radius: 12px;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+            padding-bottom: 30px;
         }
 
         h2 {
             text-align: center;
-            background-color: #000;
-            padding: 12px;
-            margin: 0 0 20px 0;
+            font-size: 0.9rem;
             text-transform: uppercase;
-            font-size: 1.1rem;
-            border-radius: 8px;
+            margin: 10px 0 20px 0;
+            letter-spacing: 1px;
+            opacity: 0.8;
         }
 
-        .fuel-section {
-            margin-bottom: 20px;
+        /* ACORDEÃO */
+        details {
+            background-color: #fff;
+            margin-bottom: 8px;
             border-radius: 10px;
             overflow: hidden;
-            background-color: #fff;
-            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
-        .label-header {
-            padding: 10px;
-            text-align: center;
+        summary {
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            cursor: pointer;
             font-weight: bold;
             color: white;
             text-transform: uppercase;
+            outline: none;
         }
-        .etanol-color { background-color: #1e6b30; }
-        .gasolina-color { background-color: #d35400; }
 
-        .grid {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1px;
+        summary::-webkit-details-marker { display: none; }
+
+        /* CORES POR TIPO (ATUALIZADAS PARA TONS ESCUROS NAS ADITIVADAS) */
+        .etanol-bg { background-color: #27ae60; } /* Verde claro para comum */
+        .etanol-adi-bg { background-color: #1e6b30; } /* Verde escuro para aditivada */
+        
+        .gasolina-bg { background-color: #e67e22; } /* Laranja claro para comum */
+        .gasolina-adi-bg { background-color: #d35400; } /* Laranja escuro para aditivada */
+        
+        .diesel-bg { background-color: #7f8c8d; } /* Cinza para diesel */
+
+        .summary-label { font-size: 0.85rem; }
+        .summary-res { font-size: 1.1rem; font-weight: 900; }
+
+        /* CONTEÚDO */
+        .content {
             background-color: #eee;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .result-container {
+            background-color: #f0fff4;
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .result-label {
+            font-size: 0.7rem;
+            color: #1e6b30;
+            font-weight: bold;
+            display: block;
+        }
+
+        .result-value {
+            font-weight: 900;
+            font-size: 2.2rem; 
+            color: #27ae60;
+        }
+
+        .payment-box {
+            background-color: #fffde7;
+            padding: 15px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 1px;
         }
 
         .grid-box {
-            flex: 1 1 150px;
+            flex: 1;
             background-color: white;
-            padding: 12px;
-            color: #333;
+            padding: 10px;
         }
 
         .info-text {
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             color: #666;
             display: block;
             margin-bottom: 4px;
             font-weight: 700;
+            text-transform: uppercase;
         }
 
         input {
@@ -83,38 +129,13 @@
             padding: 10px;
             font-size: 1.1rem;
             font-weight: bold;
-            margin-bottom: 10px;
             border-radius: 6px;
             color: #1a4a8e;
             inputmode: decimal;
         }
 
-        .result-container {
-            background-color: #f0fff4; /* Fundo levemente esverdeado */
-            padding: 12px;
-            border-radius: 6px;
-            text-align: center;
-            border: 2px solid #27ae60; /* Borda verde */
-            margin-top: 5px;
-        }
+        input:focus { border-color: #1a4a8e; outline: none; background-color: #f0f7ff; }
 
-        .result-label {
-            font-size: 0.75rem;
-            color: #1e6b30;
-            font-weight: bold;
-            display: block;
-            margin-bottom: 2px;
-        }
-
-        .result-value {
-            font-weight: 900;
-            font-size: 1.6rem; /* Aumentado para dar destaque */
-            color: #27ae60; /* COR VERDE SOLICITADA */
-        }
-
-        @media (max-width: 360px) {
-            .grid-box { flex: 1 1 100%; }
-        }
     </style>
 </head>
 <body>
@@ -122,51 +143,81 @@
 <div class="container">
     <h2>Conversor de Preços</h2>
 
-    <div class="fuel-section">
-        <div class="label-header etanol-color">ETANOL</div>
-        <div class="grid">
-            <div class="grid-box">
-                <span class="info-text">Preço Bomba (R$)</span>
-                <input type="number" id="e_bomba" value="5.99" step="0.001" oninput="calc('e')">
-                
-                <span class="info-text">Preço no App (R$) </span>
-                <input type="number" id="e_pago" value="4.39" step="0.001" oninput="calc('e')">
-            </div>
-
-            <div class="grid-box">
-                <span class="info-text">Valor a Pagar </span>
-                <input type="number" id="e_final" placeholder="Ex:R$ 50,00" oninput="calc('e')">
-                
-                <div class="result-container">
-                    <span class="result-label">TOTAL NA BOMBA</span>
-                    <div class="result-value" id="e_total_bomba">R$ 0,00</div>
-                </div>
+    <details name="combustivel" open>
+        <summary class="etanol-bg">
+            <span class="summary-label">Etanol Comum</span>
+            <span class="summary-res" id="ec_res_resumo">R$ 0,00</span>
+        </summary>
+        <div class="content">
+            <div class="result-container"><span class="result-label">NA BOMBA</span><div class="result-value" id="ec_total_bomba">R$ 0,00</div></div>
+            <div class="payment-box"><span class="info-text">Quanto quer pagar?</span><input type="number" id="ec_final" oninput="calc('ec')" onclick="this.select()"></div>
+            <div class="input-row">
+                <div class="grid-box"><span class="info-text">Bomba</span><input type="number" id="ec_bomba" value="5.99" step="0.001" oninput="calc('ec')"></div>
+                <div class="grid-box"><span class="info-text">App</span><input type="number" id="ec_pago" value="4.39" step="0.001" oninput="calc('ec')"></div>
             </div>
         </div>
-    </div>
+    </details>
 
-    <div class="fuel-section">
-        <div class="label-header gasolina-color">GASOLINA</div>
-        <div class="grid">
-            <div class="grid-box">
-                <span class="info-text">Preço Bomba (R$)</span>
-                <input type="number" id="g_bomba" value="9.29" step="0.001" oninput="calc('g')">
-                
-                <span class="info-text">Preço no App (R$)</span>
-                <input type="number" id="g_pago" value="7.39" step="0.001" oninput="calc('g')">
-            </div>
-
-            <div class="grid-box">
-                <span class="info-text">Valor a Pagar </span>
-                <input type="number" id="g_final" placeholder="Ex:R$ 50,00" oninput="calc('g')">
-                
-                <div class="result-container">
-                    <span class="result-label">TOTAL NA BOMBA</span>
-                    <div class="result-value" id="g_total_bomba">R$ 0,00</div>
-                </div>
+    <details name="combustivel">
+        <summary class="etanol-adi-bg">
+            <span class="summary-label">Etanol Aditivado</span>
+            <span class="summary-res" id="ea_res_resumo">R$ 0,00</span>
+        </summary>
+        <div class="content">
+            <div class="result-container"><span class="result-label">NA BOMBA</span><div class="result-value" id="ea_total_bomba">R$ 0,00</div></div>
+            <div class="payment-box"><span class="info-text">Quanto quer pagar?</span><input type="number" id="ea_final" oninput="calc('ea')" onclick="this.select()"></div>
+            <div class="input-row">
+                <div class="grid-box"><span class="info-text">Bomba</span><input type="number" id="ea_bomba" value="6.29" step="0.001" oninput="calc('ea')"></div>
+                <div class="grid-box"><span class="info-text">App</span><input type="number" id="ea_pago" value="4.59" step="0.001" oninput="calc('ea')"></div>
             </div>
         </div>
-    </div>
+    </details>
+
+    <details name="combustivel">
+        <summary class="gasolina-bg">
+            <span class="summary-label">Gasolina Comum</span>
+            <span class="summary-res" id="gc_res_resumo">R$ 0,00</span>
+        </summary>
+        <div class="content">
+            <div class="result-container"><span class="result-label">NA BOMBA</span><div class="result-value" id="gc_total_bomba">R$ 0,00</div></div>
+            <div class="payment-box"><span class="info-text">Quanto quer pagar?</span><input type="number" id="gc_final" oninput="calc('gc')" onclick="this.select()"></div>
+            <div class="input-row">
+                <div class="grid-box"><span class="info-text">Bomba</span><input type="number" id="gc_bomba" value="9.39" step="0.001" oninput="calc('gc')"></div>
+                <div class="grid-box"><span class="info-text">App</span><input type="number" id="gc_pago" value="7.49" step="0.001" oninput="calc('gc')"></div>
+            </div>
+        </div>
+    </details>
+
+    <details name="combustivel">
+        <summary class="gasolina-adi-bg">
+            <span class="summary-label">Gasolina Aditivada</span>
+            <span class="summary-res" id="ga_res_resumo">R$ 0,00</span>
+        </summary>
+        <div class="content">
+            <div class="result-container"><span class="result-label">NA BOMBA</span><div class="result-value" id="ga_total_bomba">R$ 0,00</div></div>
+            <div class="payment-box"><span class="info-text">Quanto quer pagar?</span><input type="number" id="ga_final" oninput="calc('ga')" onclick="this.select()"></div>
+            <div class="input-row">
+                <div class="grid-box"><span class="info-text">Bomba</span><input type="number" id="ga_bomba" value="9.69" step="0.001" oninput="calc('ga')"></div>
+                <div class="grid-box"><span class="info-text">App</span><input type="number" id="ga_pago" value="7.69" step="0.001" oninput="calc('ga')"></div>
+            </div>
+        </div>
+    </details>
+
+    <details name="combustivel">
+        <summary class="diesel-bg">
+            <span class="summary-label">Diesel S10 Adit.</span>
+            <span class="summary-res" id="da_res_resumo">R$ 0,00</span>
+        </summary>
+        <div class="content">
+            <div class="result-container"><span class="result-label">NA BOMBA</span><div class="result-value" id="da_total_bomba">R$ 0,00</div></div>
+            <div class="payment-box"><span class="info-text">Quanto quer pagar?</span><input type="number" id="da_final" oninput="calc('da')" onclick="this.select()"></div>
+            <div class="input-row">
+                <div class="grid-box"><span class="info-text">Bomba</span><input type="number" id="da_bomba" value="9.59" step="0.001" oninput="calc('da')"></div>
+                <div class="grid-box"><span class="info-text">App</span><input type="number" id="da_pago" value="7.69" step="0.001" oninput="calc('da')"></div>
+            </div>
+        </div>
+    </details>
+
 </div>
 
 <script>
@@ -176,13 +227,18 @@
         const totalPagar = parseFloat(document.getElementById(tipo + '_final').value) || 0;
 
         const resDisplay = document.getElementById(tipo + '_total_bomba');
+        const resResumo = document.getElementById(tipo + '_res_resumo');
 
         if (precoDesconto > 0 && totalPagar > 0) {
             const litros = totalPagar / precoDesconto;
             const totalBomba = litros * precoBomba;
-            resDisplay.innerText = "R$ " + totalBomba.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            const formatado = "R$ " + totalBomba.toLocaleString('pt-br', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            
+            resDisplay.innerText = formatado;
+            resResumo.innerText = formatado;
         } else {
             resDisplay.innerText = "R$ 0,00";
+            resResumo.innerText = "R$ 0,00";
         }
     }
 </script>
